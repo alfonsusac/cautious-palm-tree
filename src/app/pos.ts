@@ -1,7 +1,8 @@
 export class Pos {
   constructor(
     readonly x: number,
-    readonly y: number
+    readonly y: number,
+    readonly z?: number,
   ) { }
   toString = () => `x: ${ this.x } y: ${ this.y }`
   subtract(pos: Pos) {
@@ -24,16 +25,5 @@ export class Pos {
   }
   get isZero() {
     return this.x === 0 && this.y === 0
-  }
-}
-
-export class Rectangle {
-  constructor(
-    readonly x: number,
-    readonly y: number,
-    readonly width: number,
-    readonly height: number,
-  ) {
-    
   }
 }

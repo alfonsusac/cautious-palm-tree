@@ -1,13 +1,19 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMouse } from "./use-mouse2"
+import { Pos } from "./pos"
 
-export function useZoom() {
+export function useZoom(
+  // onZoom: () => {
+
+  // }
+) {
 
   const [zoom, setZoom] = useState(0)
   const [zoomDelta, setZoomDelta] = useState(0)
+  const zoomFactor = (1 / (1 - zoom))
 
   const {
-
+    position
   } = useMouse(mouse => {
     setZoom(prev => {
       const minZoom = 0.5 // 200%
@@ -18,7 +24,8 @@ export function useZoom() {
 
       // Determine the scaling factor based on the direction of the zoom
       const scaleFactor = mouse.scrollDelta < 0 ? (1 + zoomInFactor * scrollStep) : (1 - zoomOutFactor * scrollStep)
-      let newZoom = prev - (mouse.scrollDelta / 1200)
+      if (mouse.scrollDelta === 0) return prev
+      let newZoom = prev - (mouse.scrollDelta < 0 ? -0.1 : 0.1)
       newZoom = Math.min(newZoom, minZoom)
       newZoom = Math.max(newZoom, maxZoom)
       const newZoomDelta = newZoom - prev
@@ -27,27 +34,10 @@ export function useZoom() {
     })
   })
 
-  // useEffect(() => {
-  //   if (!position) return
-  //   const screenCenter = new Pos(
-  //     window.innerWidth / 2,
-  //     window.innerHeight / 2
-  //   )
-  //   const distFromCenter = position.subtract(screenCenter)
-  //   const zoomPositionOffset = new Pos(
-  //     distFromCenter.x * zoomDelta,
-  //     distFromCenter.y * zoomDelta
-  //   )
-  //   setViewOffset(prev => {
-  //     const newOffsetX = prev.x - zoomPositionOffset.x
-  //     const newOffsetY = prev.y - zoomPositionOffset.y
-  //     return new Pos(newOffsetX, newOffsetY)
-  //   })
-  // }, [zoom])
-
   return {
-    zoom, zoomDelta
+    zoom,
+    zoomDelta,
+    zoomFactor,
   }
-
 }
 

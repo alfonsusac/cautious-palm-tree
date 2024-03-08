@@ -3,6 +3,7 @@ import { Pos } from "./pos"
 import { useMouse } from "./use-mouse2"
 import { GlobalDragContext } from "./app"
 import toast from "react-hot-toast"
+import { useZoom } from "./use-zoom"
 
 export function useMouseDrag<T extends HTMLElement>(
   target: RefObject<T>,
@@ -43,9 +44,11 @@ export function useMouseDrag<T extends HTMLElement>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [leftClick, dragging, dragRef, setDragRef])
 
+  const { zoomFactor, zoom } = useZoom()
+
   useEffect(() => {
     if (dragging && positionDelta) {
-      onDrag(positionDelta)
+      onDrag(positionDelta.scale(1 / zoomFactor))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dragging, positionDelta])

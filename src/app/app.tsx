@@ -10,7 +10,7 @@ import { Pos } from "./pos"
 import Draggable from "react-draggable"
 import { Workspace } from "./Workspace"
 import { Model } from "./Model"
-import { CenterDot } from "./debug"
+import { CenterDot, ZoomDebug } from "./debug"
 import { SelectionBox } from "./Selection"
 
 
@@ -137,6 +137,7 @@ export function App() {
       <div className="text-white absolute inset-0 pointer-events-none">
         {!!dragRef + ''} <br />
         {JSON.stringify(dragRef)}
+        <ZoomDebug />
       </div>
       <SelectionBox />
       <main className="bg-black h-screen w-screen overflow-hidden *:data-[isdragging=true]:!cursor-grab"
