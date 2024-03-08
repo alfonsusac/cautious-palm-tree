@@ -4,10 +4,10 @@ import { useMouse } from "./use-mouse2"
 import { GlobalDragContext } from "./app"
 import toast from "react-hot-toast"
 import { useZoom } from "./use-zoom"
+import { useElementUnderMouse } from "./use-element-under-mouse"
 
 export function useMouseDrag<T extends HTMLElement>(
   target: RefObject<T>,
-  initialPosition: Pos, // todo: remove this
   onDrag: (delta: Pos) => void,
   onEnd: () => void,
   scale: number = 1,
@@ -22,18 +22,32 @@ export function useMouseDrag<T extends HTMLElement>(
     position: mousePos,
   } = mouse
 
-  useEffect(() => {
-    if (leftClick && !positionDelta.isZero && !dragging && mousePos && !dragRef) {
-      const el = document.elementFromPoint(mousePos.x, mousePos.y)
+  const { elementIdUnderMouse } = useElementUnderMouse()
 
-      if (!el) return
-      if (!target.current) return
-      if (el.id === target.current.id) {
+  useEffect(() => {
+    if (
+      leftClick
+      && !positionDelta.isZero
+      && !dragging
+      && mousePos
+      && !dragRef
+      && target.current
+      && elementIdUnderMouse === target.current.id
+    ) {
+      if (target.current) {
         setDragging(true)
-        setDragRef(el.id)
+        setDragRef(target.current?.id)
       }
     }
-  }, [leftClick, positionDelta, dragging, mousePos, target, dragRef, setDragRef])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leftClick,
+    positionDelta,
+    dragging,
+    mousePos,
+    target,
+    dragRef,
+    setDragRef,
+  ])
 
   useEffect(() => {
     if (leftClick === false && dragging) {
@@ -45,7 +59,6 @@ export function useMouseDrag<T extends HTMLElement>(
   }, [leftClick, dragging, dragRef, setDragRef])
 
   const { zoomFactor, zoom } = useZoom()
-
   useEffect(() => {
     if (dragging && positionDelta) {
       onDrag(positionDelta.scale(1 / zoomFactor))

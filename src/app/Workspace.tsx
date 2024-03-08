@@ -5,6 +5,7 @@ import toast from "react-hot-toast"
 import useTabFocus from "./use-active-tab"
 import { useMouseDrag } from "./use-mouse-drag"
 import { useZoom } from "./use-zoom"
+import { useEventListener } from "./use-event-listener"
 
 
 
@@ -28,19 +29,24 @@ export function Workspace(
 
   })
 
+  const { zoomFactor } = useZoom()
+
   // Side effect to dragging.
   useEffect(() => {
     if (!dragging && middleClick && isTabFocused) {
       setDragging(true)
+      document.body.style.cursor = 'grab'
     }
     if (dragging && !middleClick) {
       setDragging(false)
+      document.body.style.cursor = 'auto'
     }
     if (dragging && middleClick) {
-      setViewOffset(prev => ({ pos: prev.pos.add(positionDelta), zoom: prev.zoom }))
+      setViewOffset(prev => ({ pos: prev.pos.add(positionDelta.scale(1 / zoomFactor)), zoom: prev.zoom }))
     }
-  }, [middleClick, dragging, positionDelta, isTabFocused])
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [middleClick, dragging, positionDelta, isTabFocused])
 
   useEffect(() => {
     if (!position) return
@@ -51,19 +57,35 @@ export function Workspace(
     const distFromCenter = position.subtract(screenCenter)
     const zoomPositionOffset = distFromCenter.scale(zoomDelta)
     const newoffset = viewOffset.pos.subtract(zoomPositionOffset)
-    console.log(newoffset)
+    // console.log(newoffset)
     setViewOffset({ pos: newoffset, zoom })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom])
 
-
   const workspaceRef = useRef<HTMLDivElement>(null)
   const { } = useMouseDrag(
     workspaceRef,
-    new Pos(0, 0),
     () => { },
     () => { },
   )
+
+  useEventListener('wheel', (e) => {
+    if (!e.deltaX) return
+    console.log("Hellos")
+    // const position = new Pos(e.clientX, e.clientY)
+    // const screenCenter = new Pos(
+    //   window.innerWidth / 2,
+    //   window.innerHeight / 2
+    // )
+    // const distFromCenter = position.subtract(screenCenter)
+    // const zoomPositionOffset = distFromCenter.scale(zoomDelta)
+    // const newoffset = viewOffset.pos.subtract(zoomPositionOffset)
+    // console.log(newoffset)
+    // console.log(e)
+    // setViewOffset(prev => ({ pos: prev.pos.add(positionDelta.scale(1 / zoomFactor)), zoom: prev.zoom }))
+
+    setViewOffset({ pos: viewOffset.pos.add(new Pos(-e.deltaX, -e.deltaY).scale(1 / zoomFactor)), zoom: viewOffset.zoom })
+  })
 
   return (
     <div

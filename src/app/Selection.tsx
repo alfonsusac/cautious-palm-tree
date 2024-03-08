@@ -16,13 +16,8 @@ export function SelectionBox() {
     position
   } = useMouseDrag(
     boxRef,
-    new Pos(0, 0),
-    () => {
-
-    },
-    () => {
-
-    }
+    () => {},
+    () => {},
   )
 
   const [initPos, setInitPos] = useState<Pos>()

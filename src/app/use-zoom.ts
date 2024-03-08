@@ -11,10 +11,17 @@ export function useZoom(
   const [zoom, setZoom] = useState(0)
   const [zoomDelta, setZoomDelta] = useState(0)
   const zoomFactor = (1 / (1 - zoom))
+  const inverseZoom = 1 - zoom
 
   const {
     position
   } = useMouse(mouse => {
+    if (!("deltaY" in mouse.event)) return
+    if (mouse.event.deltaX) return
+    if(!mouse.event.metaKey && !mouse.event.ctrlKey) return
+
+    console.log(mouse.event.deltaMode)
+
     setZoom(prev => {
       const minZoom = 0.5 // 200%
       const maxZoom = -4 // 20%
@@ -38,6 +45,7 @@ export function useZoom(
     zoom,
     zoomDelta,
     zoomFactor,
+    inverseZoom,
   }
 }
 

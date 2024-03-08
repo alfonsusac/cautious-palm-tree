@@ -1,6 +1,7 @@
 import { useRef } from "react"
 import { useMouse } from "./use-mouse2"
 import { useZoom } from "./use-zoom"
+import { useEventListener } from "./use-event-listener"
 
 export function MouseDebug() {
   return (
@@ -21,14 +22,30 @@ export function ZoomDebug() {
   const ref1 = useRef<HTMLDivElement>(null)
   const ref2 = useRef<HTMLDivElement>(null)
   const { } = useMouse((mouse) => {
-    if(!ref1.current) return
-    ref1.current.style.transform = `translateX(${mouse.positionDelta.x}px) translateY(${mouse.positionDelta.y}px)`
+    if (!ref1.current) return
+    ref1.current.style.transform = `translateX(${ mouse.positionDelta.x }px) translateY(${ mouse.positionDelta.y }px)`
     if (!ref2.current) return
-    // console.log(mouse.scrollDelta)
-    ref2.current.style.transform = `translateY(${ mouse.scrollDelta }px)`
+    const scrollEv = mouse.event as WheelEvent
+    // console.log(scrollEv)
+    ref2.current.style.transform = `translateY(${ scrollEv.deltaY }px) translateX(${ scrollEv.deltaX }px)`
   })
 
   const zoom = useZoom()
+
+  useEventListener('wheel', (e) => {
+    if (!e.deltaX) return
+    console.log("Hellos")
+
+    // console.log(newoffset)
+  })
+
+  
+
+  useEventListener('wheel', (e) => {
+    e.preventDefault()
+  }, {
+    passive: false
+  })
 
   return (
     <div className="relative w-40 h-40 bg-white/20 z-40 border border-white">
@@ -46,14 +63,14 @@ export function ZoomDebug() {
         {zoom.zoom}
       </div>
       <div>
-        { 100/(1-zoom.zoom)}
+        {100 / (1 - zoom.zoom)}
       </div>
     </div>
   )
 }
 
 function Dot() {
-  
+
   return (
     <div className="">
 

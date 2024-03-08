@@ -10,6 +10,7 @@ type CustomMouseEventPayload = {
   leftClick: boolean,
   rightClick: boolean,
   middleClick: boolean,
+  event: MouseEvent | WheelEvent
 }
 
 export function useMouse(mouseEv: (
@@ -21,6 +22,7 @@ export function useMouse(mouseEv: (
     leftClick: boolean,
     rightClick: boolean,
     middleClick: boolean,
+    event: MouseEvent | WheelEvent
   }>()
   const [prevPosition, setPrevPosition] = useState<null | Pos>(null)
   const [positionDelta, setPositionDelta] = useState(new Pos(0, 0))
@@ -56,6 +58,7 @@ export function useMouseEventListener(
     leftClick: boolean,
     rightClick: boolean,
     middleClick: boolean,
+    event: MouseEvent | WheelEvent,
   }) => void
 ) {
   useEffect(() => {
@@ -67,6 +70,7 @@ export function useMouseEventListener(
         leftClick: e.buttons === 1,
         rightClick: e.buttons === 2,
         middleClick: e.buttons === 4,
+        event: e
       })
     }
     function wheelEventHandler(e: WheelEvent) {
@@ -77,6 +81,7 @@ export function useMouseEventListener(
         leftClick: e.buttons === 1,
         rightClick: e.buttons === 2,
         middleClick: e.buttons === 4,
+        event: e
       })
     }
     window.addEventListener('mousemove', mouseEventHandler)
