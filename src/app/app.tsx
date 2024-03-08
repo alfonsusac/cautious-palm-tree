@@ -43,7 +43,7 @@ export function App() {
 
   useEffect(() => {
     if (isMiddleDragging) {
-      setViewOffset(prev => prev.add(deltaMousePos.scalar(1 / zoomRatio)))
+      setViewOffset(prev => prev.add(deltaMousePos.scale(1 / zoomRatio)))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMiddleDragging, deltaMousePos])
@@ -128,16 +128,6 @@ export function App() {
     setIsDragging(nodeid)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLeftDragging])
-
-  useEffect(() => {
-    if (dragging) {
-      // addModelPosition(dragging, deltaMousePos)
-      const ref = modelsRefList.current[dragging]?.current
-      if (ref) {
-        ref.style.backgroundColor = "#400"
-      }
-    }
-  }, [dragging, deltaMousePos])
 
   return (
     <GlobalDragContext.Provider value={{

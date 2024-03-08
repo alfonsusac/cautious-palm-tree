@@ -6,7 +6,7 @@ import toast from "react-hot-toast"
 type CustomMouseEventPayload = {
   position: Pos,
   positionDelta: Pos,
-  scroll: number,
+  scrollDelta: number,
   leftClick: boolean,
   rightClick: boolean,
   middleClick: boolean,
@@ -17,7 +17,7 @@ export function useMouse(mouseEv: (
 ) {
   const [mouseBasicEvent, setMouseBasicEvent] = useState<{
     position: Pos,
-    scroll: number,
+    scrollDelta: number,
     leftClick: boolean,
     rightClick: boolean,
     middleClick: boolean,
@@ -52,7 +52,7 @@ export function useMouse(mouseEv: (
 export function useMouseEventListener(
   mouseEv: (data: {
     position: Pos,
-    scroll: number,
+    scrollDelta: number,
     leftClick: boolean,
     rightClick: boolean,
     middleClick: boolean,
@@ -63,7 +63,7 @@ export function useMouseEventListener(
       // console.log(e.button, e.buttons)
       mouseEv({
         position: new Pos(e.clientX, e.clientY),
-        scroll: 0,
+        scrollDelta: 0,
         leftClick: e.buttons === 1,
         rightClick: e.buttons === 2,
         middleClick: e.buttons === 4,
@@ -73,7 +73,7 @@ export function useMouseEventListener(
       // console.log(e.button, e.buttons)
       mouseEv({
         position: new Pos(e.clientX, e.clientY),
-        scroll: e.deltaZ,
+        scrollDelta: e.deltaY,
         leftClick: e.buttons === 1,
         rightClick: e.buttons === 2,
         middleClick: e.buttons === 4,

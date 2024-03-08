@@ -10,7 +10,7 @@ export class Pos {
   add(pos: Pos) {
     return new Pos(this.x + pos.x, this.y + pos.y)
   }
-  scalar(scale: number) {
+  scale(scale: number) {
     return new Pos(this.x * scale, this.y * scale)
   }
   zero() {
