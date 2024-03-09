@@ -18,7 +18,7 @@ export function useZoom(
   } = useMouse(mouse => {
     if (!("deltaY" in mouse.event)) return
     if (mouse.event.deltaX) return
-    if(!mouse.event.metaKey && !mouse.event.ctrlKey) return
+    if (!mouse.event.metaKey && !mouse.event.ctrlKey) return
 
     console.log(mouse.event.deltaMode)
 
@@ -28,11 +28,9 @@ export function useZoom(
       const scrollStep = 1 // Fixed scroll step size
       const zoomOutFactor = 0.02 // Percentage decrease per scroll step when zooming out
       const zoomInFactor = 0.02 // Percentage increase per scroll step when zooming in
-
       // Determine the scaling factor based on the direction of the zoom
-      const scaleFactor = mouse.scrollDelta < 0 ? (1 + zoomInFactor * scrollStep) : (1 - zoomOutFactor * scrollStep)
       if (mouse.scrollDelta === 0) return prev
-      let newZoom = prev - (mouse.scrollDelta < 0 ? -0.1 : 0.1)
+      let newZoom = prev - mouse.scrollDelta/200
       newZoom = Math.min(newZoom, minZoom)
       newZoom = Math.max(newZoom, maxZoom)
       const newZoomDelta = newZoom - prev

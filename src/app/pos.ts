@@ -14,6 +14,12 @@ export class Pos {
   scale(scale: number) {
     return new Pos(this.x * scale, this.y * scale)
   }
+  get manhatDist() {
+    return Math.abs(this.x) + Math.abs(this.y)
+  }
+  get abs() {
+    return new Pos(Math.abs(this.x), Math.abs(this.y))
+  }
   zero() {
     return this.x === 0 && this.y === 0
   }
@@ -26,4 +32,5 @@ export class Pos {
   get isZero() {
     return this.x === 0 && this.y === 0
   }
+
 }

@@ -1,12 +1,13 @@
 "use client"
 
-import { Dispatch, RefObject, SetStateAction, createContext, useEffect, useRef, useState } from "react"
+import { Context, Dispatch, RefObject, SetStateAction, createContext, useEffect, useRef, useState } from "react"
 import { useMouse } from "./use-mouse"
 import { Pos } from "./pos"
 import { Workspace } from "./Workspace"
 import { Model } from "./Model"
 import { CenterDot, ZoomDebug } from "./debug"
 import { SelectionBox } from "./Selection"
+import { Rect } from "./rect"
 
 
 
@@ -23,13 +24,31 @@ export const GlobalDragContext = createContext<{
 }>({} as any)
 
 export const GlobalSelectionContext = createContext<{
-  selectP1?: Pos,
-  selectP2?: Pos,
+  region: Rect | null,
+  selecting: boolean,
+  setSelecting: Dispatch<SetStateAction<boolean>>
+  setRegion: Dispatch<SetStateAction<Rect | null>>,
+  selection: string[]
+  setSelection: (ids: string[]) => void
+  clearSelection: () => void,
+  addSelection: (ids: string[]) => void,
+  removeSelection: (ids: string[]) => void,
+  toggleSelection: (ids: string[]) => void
 }>({} as any)
+
+type ContextType<C extends Context<any>,> = C extends Context<infer T> ? T : never
 
 export function App() {
 
   const [dragRef, setDragRef] = useState<null | string>(null)
+  const [region, setRegion] = useState<ContextType<typeof GlobalSelectionContext>['region']>(null)
+  const [selection, setSelection] = useState<string[]>([])
+  const [selecting, setSelecting] = useState(false)
+
+  const clearSelection = () => setSelection([])
+  const addSelection = (ids: string[]) => ids.map(id => selection.includes(id) ? null : setSelection(prev => [...prev, id]))
+  const removeSelection = (ids: string[]) => ids.map(id => selection.includes(id) ? setSelection(prev => prev.filter(p => p !== id)) : null)
+  const toggleSelection = (ids: string[]) => ids.map(id => selection.includes(id) ? setSelection(prev => prev.filter(p => p !== id)) : setSelection(prev => [...prev, id]))
 
   // MODEL DATA
   const [models, setModels] = useState<Model[]>([])
@@ -64,33 +83,34 @@ export function App() {
   }
 
   return (
-    <GlobalDragContext.Provider value={{
-      dragRef,
-      setDragRef,
-    }}>
-      <div className="text-white absolute inset-0 pointer-events-none">
-        {!!dragRef + ''} <br />
-        {JSON.stringify(dragRef)}
-        <ZoomDebug />
-      </div>
-      <SelectionBox />
-      <main className="bg-black h-screen w-screen overflow-hidden">
-        <CenterDot />
-        <Workspace>
-          {
-            models.map(model =>
-              <Model
-                key={model.id}
-                data={model}
-                onDragEnd={(newpos) => {
-                  updateModelPosition(model.id, newpos)
-                }}
-              />
-            )
-          }
-        </Workspace>
+    <GlobalDragContext.Provider value={{ dragRef, setDragRef }}>
+      <GlobalSelectionContext.Provider value={{
+        region, setRegion, selection, setSelection, clearSelection, addSelection, removeSelection, toggleSelection,
+        selecting, setSelecting
+      }}>
+        <div className="text-white absolute inset-0 pointer-events-none">
+          {!!dragRef + ''} <br />
+          {JSON.stringify(dragRef)}
+          <ZoomDebug />
+        </div>
+        <SelectionBox />
+        <main className="bg-black h-screen w-screen overflow-hidden">
+          <CenterDot />
+          <Workspace>
+            {
+              models.map(model =>
+                <Model
+                  key={model.id}
+                  data={model}
+                  onDragEnd={(newpos) => {
+                    updateModelPosition(model.id, newpos)
+                  }}
+                />
+              )
+            }
+          </Workspace>
 
-        {/* Context Menu on Empty Space
+          {/* Context Menu on Empty Space
       <Dropdown
         className="origin-center fixed w-48"
         style={{
@@ -118,8 +138,9 @@ export function App() {
           }
         }
       </Dropdown> */}
-      </main>
-    </GlobalDragContext.Provider>
+        </main>
+      </GlobalSelectionContext.Provider>
+    </GlobalDragContext.Provider >
 
   )
 }

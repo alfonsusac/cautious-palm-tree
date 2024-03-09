@@ -11,6 +11,14 @@ type CustomMouseEventPayload = {
   rightClick: boolean,
   middleClick: boolean,
   event: MouseEvent | WheelEvent
+  prev: {
+    position: Pos,
+    scrollDelta: number,
+    leftClick: boolean,
+    rightClick: boolean,
+    middleClick: boolean,
+    event: MouseEvent | WheelEvent
+  } | undefined
 }
 
 export function useMouse(mouseEv: (
@@ -24,11 +32,22 @@ export function useMouse(mouseEv: (
     middleClick: boolean,
     event: MouseEvent | WheelEvent
   }>()
+  const [prevMouseBasicEvent, setPrevMouseBasicEvent] = useState<{
+    position: Pos,
+    scrollDelta: number,
+    leftClick: boolean,
+    rightClick: boolean,
+    middleClick: boolean,
+    event: MouseEvent | WheelEvent
+  }>()
   const [prevPosition, setPrevPosition] = useState<null | Pos>(null)
   const [positionDelta, setPositionDelta] = useState(new Pos(0, 0))
 
   useMouseEventListener((event) => {
-    setMouseBasicEvent(event)
+    setMouseBasicEvent(prev => {
+      setPrevMouseBasicEvent(prev)
+      return event
+    })
   })
 
   useEffect(() => {
@@ -39,13 +58,15 @@ export function useMouse(mouseEv: (
       // toast(delta + '')
       mouseEv({
         ...mouseBasicEvent,
+        prev: prevMouseBasicEvent,
         positionDelta: delta,
       })
     }
   }, [mouseBasicEvent])
-  
+
   return {
     ...mouseBasicEvent,
+    prev: prevMouseBasicEvent,
     positionDelta
   }
 }

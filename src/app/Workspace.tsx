@@ -16,6 +16,10 @@ export function Workspace(
 ) {
 
   const [viewOffset, setViewOffset] = useState({ pos: new Pos(0, 0), zoom: 0 })
+  const setViewPosition = (newPos: Pos) => setViewOffset(prev => ({ pos: newPos, zoom: prev.zoom }))
+  const addViewPosition = (addition: Pos) => setViewPosition(viewOffset.pos.add(addition))
+  const setViewZoom = (newZoom: number) => setViewOffset(prev => ({ pos: prev.pos, zoom: newZoom }))
+
   const [dragging, setDragging] = useState(false)
   const { isTabFocused } = useTabFocus()
 
@@ -42,9 +46,9 @@ export function Workspace(
       document.body.style.cursor = 'auto'
     }
     if (dragging && middleClick) {
-      setViewOffset(prev => ({ pos: prev.pos.add(positionDelta.scale(1 / zoomFactor)), zoom: prev.zoom }))
+      const scaledPositionOffset = positionDelta.scale(1 / zoomFactor)
+      addViewPosition(scaledPositionOffset)
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [middleClick, dragging, positionDelta, isTabFocused])
 
@@ -57,14 +61,12 @@ export function Workspace(
     const distFromCenter = position.subtract(screenCenter)
     const zoomPositionOffset = distFromCenter.scale(zoomDelta)
     const newoffset = viewOffset.pos.subtract(zoomPositionOffset)
-    // console.log(newoffset)
     setViewOffset({ pos: newoffset, zoom })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom])
 
   const workspaceRef = useRef<HTMLDivElement>(null)
   const { } = useMouseDrag(
-    workspaceRef,
     () => { },
     () => { },
   )
@@ -72,19 +74,9 @@ export function Workspace(
   useEventListener('wheel', (e) => {
     if (!e.deltaX) return
     console.log("Hellos")
-    // const position = new Pos(e.clientX, e.clientY)
-    // const screenCenter = new Pos(
-    //   window.innerWidth / 2,
-    //   window.innerHeight / 2
-    // )
-    // const distFromCenter = position.subtract(screenCenter)
-    // const zoomPositionOffset = distFromCenter.scale(zoomDelta)
-    // const newoffset = viewOffset.pos.subtract(zoomPositionOffset)
-    // console.log(newoffset)
-    // console.log(e)
-    // setViewOffset(prev => ({ pos: prev.pos.add(positionDelta.scale(1 / zoomFactor)), zoom: prev.zoom }))
-
-    setViewOffset({ pos: viewOffset.pos.add(new Pos(-e.deltaX, -e.deltaY).scale(1 / zoomFactor)), zoom: viewOffset.zoom })
+    const trackpadMovement = new Pos(-e.deltaX, -e.deltaY)
+    const scaledMovement = trackpadMovement.scale(1 / zoomFactor)
+    setViewPosition(viewOffset.pos.add(scaledMovement))
   })
 
   return (

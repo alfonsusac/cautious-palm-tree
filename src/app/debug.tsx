@@ -21,7 +21,7 @@ export function ZoomDebug() {
 
   const ref1 = useRef<HTMLDivElement>(null)
   const ref2 = useRef<HTMLDivElement>(null)
-  const { } = useMouse((mouse) => {
+  const { positionDelta } = useMouse((mouse) => {
     if (!ref1.current) return
     ref1.current.style.transform = `translateX(${ mouse.positionDelta.x }px) translateY(${ mouse.positionDelta.y }px)`
     if (!ref2.current) return
@@ -39,7 +39,7 @@ export function ZoomDebug() {
     // console.log(newoffset)
   })
 
-  
+
 
   useEventListener('wheel', (e) => {
     e.preventDefault()
@@ -49,6 +49,7 @@ export function ZoomDebug() {
 
   return (
     <div className="relative w-40 h-40 bg-white/20 z-40 border border-white">
+      {positionDelta + ''}
       <div
         className="w-1 h-1 rounded-full bg-red-500 absolute top-1/2 left-1/2"
         ref={ref1}

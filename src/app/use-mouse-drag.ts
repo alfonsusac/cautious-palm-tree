@@ -1,19 +1,18 @@
-import { Ref, RefObject, useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Pos } from "./pos"
 import { useMouse } from "./use-mouse2"
-import { GlobalDragContext } from "./app"
-import toast from "react-hot-toast"
 import { useZoom } from "./use-zoom"
 import { useElementUnderMouse } from "./use-element-under-mouse"
+import { GlobalDragContext } from "./App"
 
 export function useMouseDrag<T extends HTMLElement>(
-  target: RefObject<T>,
   onDrag: (delta: Pos) => void,
   onEnd: () => void,
   scale: number = 1,
 ) {
   const [dragging, setDragging] = useState(false)
   const { dragRef, setDragRef } = useContext(GlobalDragContext)
+  const [initialMouseDownPosition, setInitialMouseDownPosition] = useState<Pos>()
 
   const mouse = useMouse(() => { })
   const {
@@ -25,18 +24,24 @@ export function useMouseDrag<T extends HTMLElement>(
   const { elementIdUnderMouse } = useElementUnderMouse()
 
   useEffect(() => {
-    if (
-      leftClick
-      && !positionDelta.isZero
+    if (leftClick
       && !dragging
-      && mousePos
       && !dragRef
-      && target.current
-      && elementIdUnderMouse === target.current.id
+      && !initialMouseDownPosition
     ) {
-      if (target.current) {
-        setDragging(true)
-        setDragRef(target.current?.id)
+      setInitialMouseDownPosition(mousePos)
+    }
+    if (!leftClick) {
+      setInitialMouseDownPosition(undefined)
+    }
+
+    if (
+      mousePos && initialMouseDownPosition
+      && mousePos.subtract(initialMouseDownPosition).manhatDist > 10
+    ) {
+      setDragging(true)
+      if (elementIdUnderMouse && !dragRef) {
+        setDragRef(elementIdUnderMouse)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -44,9 +49,9 @@ export function useMouseDrag<T extends HTMLElement>(
     positionDelta,
     dragging,
     mousePos,
-    target,
     dragRef,
     setDragRef,
+    initialMouseDownPosition,
   ])
 
   useEffect(() => {
@@ -69,5 +74,6 @@ export function useMouseDrag<T extends HTMLElement>(
   return {
     dragging,
     ...mouse,
+    positionDelta: positionDelta.scale(1 / zoomFactor),
   }
 }
