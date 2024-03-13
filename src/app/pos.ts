@@ -1,10 +1,12 @@
+import { round } from "./util"
+
 export class Pos {
   constructor(
     readonly x: number,
     readonly y: number,
     readonly z?: number,
   ) { }
-  toString = () => `x: ${ this.x } y: ${ this.y }`
+  toString = () => `x: ${ round(this.x) } y: ${ round(this.y) }`
   subtract(pos: Pos) {
     return new Pos(this.x - pos.x, this.y - pos.y)
   }

@@ -1,45 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { use, useEffect, useState } from "react"
 import { Pos } from "./pos"
-import toast from "react-hot-toast"
+import { useEventListener } from "./use-event-listener"
 
-type CustomMouseEventPayload = {
-  position: Pos,
-  positionDelta: Pos,
-  scrollDelta: number,
-  leftClick: boolean,
-  rightClick: boolean,
-  middleClick: boolean,
-  event: MouseEvent | WheelEvent
-  prev: {
-    position: Pos,
-    scrollDelta: number,
-    leftClick: boolean,
-    rightClick: boolean,
-    middleClick: boolean,
-    event: MouseEvent | WheelEvent
-  } | undefined
+export function getElementIdUnderMouse(mouse:CustomMouseEventPayload) {
+  const el = document.elementFromPoint(mouse.position.x, mouse.position.y)
+  if (!el) return
+  if (el.id === "") return
+  return el.id
 }
 
-export function useMouse(mouseEv: (
+export type CustomMouseEventPayload = MouseEventListenerPayload & {
+  positionDelta: Pos,
+  prev: MouseEventListenerPayload | undefined
+}
+
+export function useMouse(mouseEv?: (
   data: CustomMouseEventPayload) => void,
 ) {
-  const [mouseBasicEvent, setMouseBasicEvent] = useState<{
-    position: Pos,
-    scrollDelta: number,
-    leftClick: boolean,
-    rightClick: boolean,
-    middleClick: boolean,
-    event: MouseEvent | WheelEvent
-  }>()
-  const [prevMouseBasicEvent, setPrevMouseBasicEvent] = useState<{
-    position: Pos,
-    scrollDelta: number,
-    leftClick: boolean,
-    rightClick: boolean,
-    middleClick: boolean,
-    event: MouseEvent | WheelEvent
-  }>()
+  const [mouseBasicEvent, setMouseBasicEvent] = useState<MouseEventListenerPayload>()
+  const [prevMouseBasicEvent, setPrevMouseBasicEvent] = useState<MouseEventListenerPayload>()
   const [prevPosition, setPrevPosition] = useState<null | Pos>(null)
   const [positionDelta, setPositionDelta] = useState(new Pos(0, 0))
 
@@ -55,12 +35,15 @@ export function useMouse(mouseEv: (
       const delta = mouseBasicEvent.position.subtract(prevPosition ?? mouseBasicEvent.position)
       setPrevPosition(mouseBasicEvent.position)
       setPositionDelta(delta)
-      // toast(delta + '')
-      mouseEv({
-        ...mouseBasicEvent,
-        prev: prevMouseBasicEvent,
-        positionDelta: delta,
-      })
+      // console.log(mouseBasicEvent)
+      mouseEv?.((() => {
+        // console.log("Hellol", mouseBasicEvent.leftClick)
+        return {
+          ...mouseBasicEvent,
+          prev: prevMouseBasicEvent,
+          positionDelta: delta,
+        }
+      })())
     }
   }, [mouseBasicEvent])
 
@@ -71,50 +54,34 @@ export function useMouse(mouseEv: (
   }
 }
 
+type MouseEventListenerPayload = {
+  position: Pos,
+  scrollDelta: number,
+  scrollDeltaX: number
+  leftClick: boolean,
+  rightClick: boolean,
+  middleClick: boolean,
+  event: MouseEvent | WheelEvent,
+}
 
 export function useMouseEventListener(
-  mouseEv: (data: {
-    position: Pos,
-    scrollDelta: number,
-    leftClick: boolean,
-    rightClick: boolean,
-    middleClick: boolean,
-    event: MouseEvent | WheelEvent,
-  }) => void
+  mouseEv: (data: MouseEventListenerPayload) => void
 ) {
-  useEffect(() => {
-    function mouseEventHandler(e: MouseEvent) {
-      // console.log(e.button, e.buttons)
-      mouseEv({
-        position: new Pos(e.clientX, e.clientY),
-        scrollDelta: 0,
-        leftClick: e.buttons === 1,
-        rightClick: e.buttons === 2,
-        middleClick: e.buttons === 4,
-        event: e
-      })
-    }
-    function wheelEventHandler(e: WheelEvent) {
-      // console.log(e.button, e.buttons)
-      mouseEv({
-        position: new Pos(e.clientX, e.clientY),
-        scrollDelta: e.deltaY,
-        leftClick: e.buttons === 1,
-        rightClick: e.buttons === 2,
-        middleClick: e.buttons === 4,
-        event: e
-      })
-    }
-    window.addEventListener('mousemove', mouseEventHandler)
-    window.addEventListener('mousedown', mouseEventHandler)
-    window.addEventListener('mouseup', mouseEventHandler)
-    window.addEventListener('wheel', wheelEventHandler)
-    return () => {
-      window.removeEventListener('mousemove', mouseEventHandler)
-      window.removeEventListener('mousedown', mouseEventHandler)
-      window.removeEventListener('mouseup', mouseEventHandler)
-      window.removeEventListener('wheel', wheelEventHandler)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  function eventHandler(e: MouseEvent | WheelEvent) {
+    // console.log("test")
+    mouseEv({
+      position: new Pos(e.clientX, e.clientY),
+      scrollDelta: "deltaY" in e ? e.deltaY : 0,
+      scrollDeltaX: "deltaX" in e ? e.deltaX : 0,
+      leftClick: e.buttons === 1,
+      rightClick: e.buttons === 2,
+      middleClick: e.buttons === 4,
+      event: e
+    })
+  }
+  useEventListener("mousemove", eventHandler)
+  useEventListener("mousedown", eventHandler)
+  useEventListener("mouseup", eventHandler)
+  useEventListener("mouseup", eventHandler)
+  useEventListener("wheel", eventHandler)
 }

@@ -1,15 +1,10 @@
 import { useRef } from "react"
 import { useMouse } from "./use-mouse2"
-import { useZoom } from "./use-zoom"
+// import { useZoom } from "./use-zoom"
 import { useEventListener } from "./use-event-listener"
-
-export function MouseDebug() {
-  return (
-    <div>
-
-    </div>
-  )
-}
+import { useDragContext, useDragRegion } from "./DragContext"
+import { useZoom } from "./ZoomContext"
+// import { useZoom } from "./use-zoom"
 
 export function CenterDot() {
   return (
@@ -18,28 +13,19 @@ export function CenterDot() {
 }
 
 export function ZoomDebug() {
+  // console.log("Hello")
 
   const ref1 = useRef<HTMLDivElement>(null)
   const ref2 = useRef<HTMLDivElement>(null)
-  const { positionDelta } = useMouse((mouse) => {
+  const { positionDelta ,position } = useMouse((mouse) => {
     if (!ref1.current) return
     ref1.current.style.transform = `translateX(${ mouse.positionDelta.x }px) translateY(${ mouse.positionDelta.y }px)`
     if (!ref2.current) return
     const scrollEv = mouse.event as WheelEvent
-    // console.log(scrollEv)
     ref2.current.style.transform = `translateY(${ scrollEv.deltaY }px) translateX(${ scrollEv.deltaX }px)`
   })
 
   const zoom = useZoom()
-
-  useEventListener('wheel', (e) => {
-    if (!e.deltaX) return
-    console.log("Hellos")
-
-    // console.log(newoffset)
-  })
-
-
 
   useEventListener('wheel', (e) => {
     e.preventDefault()
@@ -48,33 +34,39 @@ export function ZoomDebug() {
   })
 
   return (
-    <div className="relative w-40 h-40 bg-white/20 z-40 border border-white">
-      {positionDelta + ''}
-      <div
-        className="w-1 h-1 rounded-full bg-red-500 absolute top-1/2 left-1/2"
-        ref={ref1}
-      >
-      </div>
-      <div
-        className="w-1 h-1 rounded-full bg-blue-500 absolute top-1/2 left-1/2"
-        ref={ref2}
-      >
+    <>
+      <div className="relative w-40 h-40 bg-white/20 z-40 border border-white text-nowrap text-sm">
+        {positionDelta + ''} <br />
+        {position + ''} <br />
+        <div
+          className="w-1 h-1 rounded-full bg-red-500 absolute top-1/2 left-1/2"
+          ref={ref1}
+        >
+        </div>
+        <div
+          className="w-1 h-1 rounded-full bg-blue-500 absolute top-1/2 left-1/2"
+          ref={ref2}
+        >
+        </div>
       </div>
       <div>
-        {zoom.zoom}
+        Zoom Scale: {zoom.scale} <br />
+        Zoom Factor: {zoom.factor * 100} <br />
       </div>
-      <div>
-        {100 / (1 - zoom.zoom)}
-      </div>
-    </div>
+    </>
+
   )
 }
 
-function Dot() {
-
+export function DragDebug() {
+  const drag = useDragContext()
+  const region = useDragRegion()
+  // const { value, set } = useDraggingID()
+  // const { value, setValue } = useIsDragging()
   return (
-    <div className="">
-
+    <div>
+      Drag: id:{drag.context?.id} | pos:{drag.context?.initPosition + ''}<br />
+      Region: { region + '' }<br />
     </div>
   )
 }

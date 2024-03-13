@@ -6,7 +6,7 @@ export function useElementUnderMouse(
 ) {
 
   const [elementIdUnderMouse, setElementIdUnderMouse] = useState<string>()
-  const { position } = useMouse(() => { })
+  const { position } = useMouse()
   useEffect(() => {
     if (position) {
       const el = document.elementFromPoint(position.x, position.y)
@@ -18,6 +18,6 @@ export function useElementUnderMouse(
   }, [position])
 
   return {
-    elementIdUnderMouse,
+    elementIdUnderMouse: elementIdUnderMouse === "" ? undefined : elementIdUnderMouse,
   }
 }

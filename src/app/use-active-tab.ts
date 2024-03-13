@@ -3,14 +3,14 @@ import toast from "react-hot-toast"
 
 export default function useTabFocus() {
   
-  const [isTabFocused, setIsTabFocused] = useState(true)
+  const [focused, setFocused] = useState(true)
 
   useEffect(() => {
     function handleFocusEvent() {
-      setIsTabFocused(true)
+      setFocused(true)
     }
     function handleBlurEvent() {
-      setIsTabFocused(false)
+      setFocused(false)
     }
     window.addEventListener("focus", handleFocusEvent);
     window.addEventListener("blur", handleBlurEvent);
@@ -20,6 +20,6 @@ export default function useTabFocus() {
     }
   })
   return {
-    isTabFocused
+    focused
   }
 }
