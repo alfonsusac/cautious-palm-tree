@@ -1,7 +1,7 @@
 import { translateX, translateY } from "./translate"
 // import { useDragContext, useDragRegion } from "./DragContext"
 import { useEffect } from "react"
-import { useApp } from "./AppComponent"
+import { useApp } from "./App"
 import { useRerender } from "./use-rerender"
 
 

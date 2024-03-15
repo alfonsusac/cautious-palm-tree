@@ -1,4 +1,4 @@
-import { AppComponent } from "./AppComponent"
+import { AppComponent } from "./App"
 
 export default function Home() {
   return (

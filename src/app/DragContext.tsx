@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext, useState } from "react"
 import { Pos } from "./pos"
 import { Rect } from "./rect"
 import { getElementIdUnderMouse } from "./use-mouse2"
-import { useApp } from "./AppComponent"
+import { useApp } from "./App"
 import { Mouse } from "./use-mouse3"
 import { ObservableValue } from "./EventListener"
 

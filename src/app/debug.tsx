@@ -2,7 +2,7 @@ import { useRef } from "react"
 import { useMouse } from "./use-mouse2"
 import { useEventListener } from "./use-event-listener"
 // import { useDragContext, useDragRegion } from "./DragContext"
-import { useApp } from "./AppComponent"
+import { useApp } from "./App"
 import { round } from "./util"
 import { useRerender } from "./use-rerender"
 

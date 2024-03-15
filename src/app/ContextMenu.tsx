@@ -5,7 +5,7 @@ import { Plus } from "lucide-react"
 import toast from "react-hot-toast"
 import { useEventListener } from "./use-event-listener"
 import { useData } from "./ModelDataContext"
-import { useApp } from "./AppComponent"
+import { useApp } from "./App"
 // import { useView } from "./ViewContext"
 
 export function AppContextMenu() {

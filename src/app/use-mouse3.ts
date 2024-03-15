@@ -1,4 +1,4 @@
-import { useApp } from "./AppComponent"
+import { useApp } from "./App"
 import { EventListener } from "./EventListener"
 import { Pos } from "./pos"
 import { useEventListener } from "./use-event-listener"
