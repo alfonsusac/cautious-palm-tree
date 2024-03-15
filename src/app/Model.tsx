@@ -1,12 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Pos } from "./pos"
 // import { useMouseDrag } from "./use-mouse-drag"
 import { cn } from "@/lib/utils"
 // import { useZoom } from "./use-zoom"
-import { useDragContext } from "./DragContext"
+// import { useDragContext } from "./DragContext"
 import { useMouse } from "./use-mouse2"
-import { useZoom } from "./ZoomContext"
 import { Model } from "./ModelDataContext"
+import { useApp } from "./App"
 
 export function ModelComponent(
   props: {
@@ -16,16 +16,16 @@ export function ModelComponent(
   }
 ) {
   const [position, setPosition] = useState(props.data.position)
-  props.data.onUpdate = (model) => {
-    setPosition(model.position)
-  } 
 
-  const drag = useDragContext()
-  const zoom = useZoom()
+  props.data.onUpdate2.do((model: Model) => {
+    setPosition(model.position)
+  })
+
+  const { viewport, drag } = useApp()
 
   useMouse(mouse => {
-    if (mouse.position && drag.context?.id === props.data.id) {
-      props.data.updatePosition(position.add(mouse.positionDelta.scale(zoom.inversedScale)))
+    if (mouse.position && drag.context.value?.id === props.data.id) {
+      props.data.updatePosition(position.add(mouse.positionDelta.scale(viewport.zoom.inversedScale)))
     }
   })
 
@@ -68,33 +68,33 @@ export function ModelComponent(
 
   // useEffect(() => {
 
-    // // If selecting multiple, but no shift is clicked and detected a keyUp left click.
-    // if (!leftClick && !draggingId.value && selection.length > 1 && isThisElementDirectlyUnderMouse && prev?.leftClick) {
-    //   setSelection([props.data.id])
-    // }
+  // // If selecting multiple, but no shift is clicked and detected a keyUp left click.
+  // if (!leftClick && !draggingId.value && selection.length > 1 && isThisElementDirectlyUnderMouse && prev?.leftClick) {
+  //   setSelection([props.data.id])
+  // }
 
-    // // All code below will trigger if leftClicked.
-    // if (!leftClick || !mouseEv) return
+  // // All code below will trigger if leftClicked.
+  // if (!leftClick || !mouseEv) return
 
-    // if (!mouseEv.shiftKey) {
-    //   // Select this element if this element directly is under the mouse.
-    //   if (isThisElementDirectlyUnderMouse && isDragging.value === undefined && selection.length <= 1) {
-    //     setSelection([props.data.id])
-    //     // setSelected({ data: true })
-    //   }
-    //   // Unselect this element if the cursor is at the workspace
-    //   if (elementIdUnderMouse === null && !draggingId.value) {
-    //     clearSelection()
-    //   }
-    //   if (!isThisElementDirectlyUnderMouse) {
+  // if (!mouseEv.shiftKey) {
+  //   // Select this element if this element directly is under the mouse.
+  //   if (isThisElementDirectlyUnderMouse && isDragging.value === undefined && selection.length <= 1) {
+  //     setSelection([props.data.id])
+  //     // setSelected({ data: true })
+  //   }
+  //   // Unselect this element if the cursor is at the workspace
+  //   if (elementIdUnderMouse === null && !draggingId.value) {
+  //     clearSelection()
+  //   }
+  //   if (!isThisElementDirectlyUnderMouse) {
 
-    //   }
-    // } else {
-    //   if (isThisElementDirectlyUnderMouse && !isDragging.value) {
-    //     toggleSelection([props.data.id])
-    //   }
-    // }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   }
+  // } else {
+  //   if (isThisElementDirectlyUnderMouse && !isDragging.value) {
+  //     toggleSelection([props.data.id])
+  //   }
+  // }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [isThisElementDirectlyUnderMouse, leftClick, elementIdUnderMouse])
 
   // for thicker outline when zoomed out
@@ -118,7 +118,7 @@ export function ModelComponent(
     }}
   >
     <div className="">
-    {position + ""}<br />
+      {position + ""}<br />
     </div>
     {/* Dragging: {isDragging + ""}<br />
     Selection: {selection.includes(props.data.id) + ""}<br />

@@ -1,8 +1,5 @@
-import { useState } from "react"
 import { Pos } from "./pos"
-import { useEventListener } from "./use-event-listener"
-import { CustomMouseEventPayload, useMouse } from "./use-mouse2"
-import useTabFocus from "./use-active-tab"
+import { CustomMouseEventPayload } from "./use-mouse2"
 import { Zoom } from "./handle-zoom"
 
 export function handlePanning(
@@ -31,40 +28,55 @@ export function handlePanning(
   return new Pos(0,0)
 }
 
-export function usePan(props: {
-  onPan: (offset: Pos) => void
-}) {
-  const [dragging, setDragging] = useState(false)
-  const state = { dragging }
-  const tabFocus = useTabFocus()
-  // 
-  useMouse((mouse) => {
-    if (!state.dragging && mouse.middleClick && tabFocus.focused) {
-      setDragging(true)
-      document.body.style.cursor = 'grab'
-    }
-    if (state.dragging && !mouse.middleClick) {
-      setDragging(false)
-      document.body.style.cursor = 'auto'
-    }
-    if (state.dragging && mouse.middleClick) {
-      props.onPan(mouse.positionDelta)
-    }
-  })
+// export function usePan(props: {
+//   onPan: (offset: Pos) => void
+// }) {
+//   const [dragging, setDragging] = useState(false)
+//   const state = { dragging }
+//   const tabFocus = useTabFocus()
+//   // 
+//   // useApp().mouse.onMouseUpdate.do(mouse => {
+//   //   if (!state.dragging && mouse.middleClick && tabFocus.focused) {
+//   //     setDragging(true)
+//   //     document.body.style.cursor = 'grab'
+//   //   }
+//   //   if (state.dragging && !mouse.middleClick) {
+//   //     setDragging(false)
+//   //     document.body.style.cursor = 'auto'
+//   //   }
+//   //   if (state.dragging && mouse.middleClick) {
+//   //     props.onPan(mouse.positionDelta)
+//   //   }
+//   // })
 
 
-  // Listens to wheel events (for trackpads)
-  useEventListener('wheel', (e) => {
-    // We are only concerned for those devices that has 
-    // . deltaX, which are mainly trackpads.
-    // if (!e.deltaX) return
+//   // useMouse((mouse) => {
+//   //   if (!state.dragging && mouse.middleClick && tabFocus.focused) {
+//   //     setDragging(true)
+//   //     document.body.style.cursor = 'grab'
+//   //   }
+//   //   if (state.dragging && !mouse.middleClick) {
+//   //     setDragging(false)
+//   //     document.body.style.cursor = 'auto'
+//   //   }
+//   //   if (state.dragging && mouse.middleClick) {
+//   //     props.onPan(mouse.positionDelta)
+//   //   }
+//   // })
 
-    // Determine the delta (a.k.a movement)
-    const trackpadMovement = new Pos(-e.deltaX, -e.deltaY)
-    props.onPan(trackpadMovement)
-  })
 
-  return {
-    dragging
-  }
-}
+//   // Listens to wheel events (for trackpads)
+//   useEventListener('wheel', (e) => {
+//     // We are only concerned for those devices that has 
+//     // . deltaX, which are mainly trackpads.
+//     // if (!e.deltaX) return
+
+//     // Determine the delta (a.k.a movement)
+//     const trackpadMovement = new Pos(-e.deltaX, -e.deltaY)
+//     props.onPan(trackpadMovement)
+//   })
+
+//   return {
+//     dragging
+//   }
+// }

@@ -1,75 +1,57 @@
 import { ReactNode, createContext, useContext, useState } from "react"
 import { Pos } from "./pos"
 import { Rect } from "./rect"
-import toast from "react-hot-toast"
-import { getElementIdUnderMouse, useMouse } from "./use-mouse2"
+import { getElementIdUnderMouse } from "./use-mouse2"
+import { useApp } from "./App"
+import { Mouse } from "./use-mouse3"
+import { ObservableValue } from "./EventListener"
 
-export type DragContextValue = {
-  id: string | "workspace",
-  initPosition: Pos,
+export class Drag {
+  context = new ObservableValue<{ id: string, initialPosition: Pos } | undefined>
+  region = new ObservableValue<Rect | undefined>
+  useInit() {
+    // how to ensure that this runs once per component?
+    Mouse.onMouseUpdate.do(mouse => {
+      // Initialize selection
+      if (mouse.leftClick && !mouse.positionDelta.isZero && !this.active) {
+        this.startDragging(getElementIdUnderMouse(mouse) ?? "workspace", mouse.position)
+      }
+      if (this.context.value?.initialPosition && mouse.position && mouse.leftClick) {
+        this.region.setValue(Rect.fromPos(this.context.value.initialPosition, mouse.position))
+      }
+      if (!mouse.leftClick) {
+        this.endDragging()
+        this.region.setValue(undefined)
+      }
+      // End drag on keyup
+      if (mouse.prev?.leftClick && !mouse.leftClick && this.region.value) {
+        this.endDragging()
+        this.region.setValue(undefined)
+      }
+    })
+  }
+  get active() {
+    return !!this.context.value
+  }
+  startDragging(id: string, initialPosition: Pos) {
+    this.context.value = { id, initialPosition }
+  }
+  endDragging() {
+    this.context.value = undefined
+  }
+
 }
 
-const AppDraggingContext = createContext<
-  {
-    value: DragContextValue | undefined,
-    set: (val: DragContextValue | undefined) => void,
-  }
->({} as any)
-
-const AppDraggingRegionContext = createContext<Rect | undefined>(undefined)
-export const useDragRegion = () => useContext(AppDraggingRegionContext)
-const AppLastDragginRegionContext = createContext<Rect | undefined>(undefined)
-export const useOnDrag = () => {
-
-}
+export function DragContext(props: {
+  children: ReactNode,
+}) {
+  const { drag } = useApp()
 
 
-export const useDraggingID = () => useContext(AppDraggingContext)
-
-export function DragContext(props: { children: ReactNode }) {
-  const [value, set] = useState<DragContextValue>()
-  const startDragging = (id: string, initPosition: Pos) => set({ id, initPosition })
-  const endDragging = () => set(undefined)
-  const [region, setRegion] = useState<Rect>()
-  const [lastFinalRegion, setLastFinalRegion] = useState<Rect>()
-  const state = {
-    value,
-    region,
-    dragging: value
-  }
-  useMouse(mouse => {
-    // Initialize selection
-    if (mouse.leftClick && !mouse.positionDelta.isZero && !state.dragging) {
-      startDragging(getElementIdUnderMouse(mouse) ?? "workspace", mouse.position)
-    } 
-    if (state.value?.initPosition && mouse.position) {
-      setRegion(Rect.fromPos(state.value.initPosition, mouse.position))
-    }
-    // End drag on keyup
-    if (mouse.prev?.leftClick && !mouse.leftClick && state.region) {
-      endDragging()
-      setLastFinalRegion(state.region)
-      setRegion(undefined)
-    }
-  })
 
   return (
-    <AppDraggingContext.Provider value={{ value, set }}>
-      <AppDraggingRegionContext.Provider value={region}>
-        <AppLastDragginRegionContext.Provider value={lastFinalRegion}>
-          {props.children}
-        </AppLastDragginRegionContext.Provider>
-      </AppDraggingRegionContext.Provider>
-    </AppDraggingContext.Provider>
+    <>
+      {props.children}
+    </>
   )
-}
-
-export function useDragContext() {
-  const { set: setContext, value: context } = useDraggingID()
-  // const { setValue: setIsDragging, value: isDragging } = useIsDragging()
-  return {
-    context,
-    setContext,
-    isDragging: !!context,
-  }
 }

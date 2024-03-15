@@ -7,7 +7,8 @@ export function ModelListComponent() {
   const [models, setModels] = useState<Model[]>([])
   const data = useData()
   data.onUpdate = (models) => {
-    setModels(models)
+    console.log("On Update ModelListe? Length:", models)
+    setModels([...models])
   }
 
 
@@ -24,7 +25,7 @@ export function ModelListComponent() {
 
   return (
     <>
-      {data.models.map(model => (
+      {models.map(model => (
         <ModelComponent
           key={model.id}
           data={model}

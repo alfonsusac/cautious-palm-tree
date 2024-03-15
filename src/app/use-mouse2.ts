@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Pos } from "./pos"
 import { useEventListener } from "./use-event-listener"
+import { EventListener } from "./EventListener"
 
-export function getElementIdUnderMouse(mouse:CustomMouseEventPayload) {
+export function getElementIdUnderMouse(mouse: CustomMouseEventPayload) {
   const el = document.elementFromPoint(mouse.position.x, mouse.position.y)
   if (!el) return
   if (el.id === "") return
@@ -12,7 +13,7 @@ export function getElementIdUnderMouse(mouse:CustomMouseEventPayload) {
 
 export type CustomMouseEventPayload = MouseEventListenerPayload & {
   positionDelta: Pos,
-  prev: MouseEventListenerPayload | undefined
+  prev?: MouseEventListenerPayload | undefined
 }
 
 export function useMouse(mouseEv?: (
@@ -22,6 +23,7 @@ export function useMouse(mouseEv?: (
   const [prevMouseBasicEvent, setPrevMouseBasicEvent] = useState<MouseEventListenerPayload>()
   const [prevPosition, setPrevPosition] = useState<null | Pos>(null)
   const [positionDelta, setPositionDelta] = useState(new Pos(0, 0))
+
 
   useMouseEventListener((event) => {
     setMouseBasicEvent(prev => {
@@ -68,7 +70,6 @@ export function useMouseEventListener(
   mouseEv: (data: MouseEventListenerPayload) => void
 ) {
   function eventHandler(e: MouseEvent | WheelEvent) {
-    // console.log("test")
     mouseEv({
       position: new Pos(e.clientX, e.clientY),
       scrollDelta: "deltaY" in e ? e.deltaY : 0,
