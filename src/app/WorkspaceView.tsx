@@ -2,7 +2,7 @@ import { ReactNode } from "react"
 import { translateX, translateY, translateZ } from "./translate"
 // import { useView } from "./ViewContext"
 import { useRerender } from "./use-rerender"
-import { useApp } from "./App"
+import { useApp } from "./AppComponent"
 
 export function WorkspaceView(
   props: {

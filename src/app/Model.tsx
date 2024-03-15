@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 // import { useDragContext } from "./DragContext"
 import { useMouse } from "./use-mouse2"
 import { Model } from "./ModelDataContext"
-import { useApp } from "./App"
+import { useApp } from "./AppComponent"
 
 export function ModelComponent(
   props: {
