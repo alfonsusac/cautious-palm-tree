@@ -4,14 +4,14 @@ import { Pos } from "./pos"
 import { Plus } from "lucide-react"
 import toast from "react-hot-toast"
 import { useEventListener } from "./use-event-listener"
-import { useData } from "./ModelDataContext"
+// import { useData } from "./ModelDataContext"
 import { useApp } from "./App"
 // import { useView } from "./ViewContext"
 
 export function AppContextMenu() {
 
   // const view = useView()
-  const { viewport } = useApp()
+  const { viewport, models } = useApp()
   const [position, setPosition] = useState(new Pos(0, 0))
   const [open, setOpen] = useState(false)
 
@@ -25,11 +25,10 @@ export function AppContextMenu() {
     }
   })
 
-  const data = useData()
   function createNewModelClicked(e: MouseEvent<HTMLDivElement>) {
     const screenHalf = new Pos(window.innerWidth / 2, window.innerHeight / 2)
 
-    data.createModel(
+    models.createModel(
       new Pos(e.clientX, e.clientY)
         .subtract(screenHalf)
         .scale(viewport.zoom.inversedScale)

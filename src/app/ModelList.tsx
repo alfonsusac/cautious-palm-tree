@@ -1,31 +1,18 @@
 import { useEffect, useState } from "react"
 import { ModelComponent } from "./Model"
-import { Model, useData } from "./ModelDataContext"
+// import { Model, useData } from "./ModelDataContext"
+import { useApp } from "./App"
+import { useRerender } from "./use-rerender"
 
 export function ModelListComponent() {
 
-  const [models, setModels] = useState<Model[]>([])
-  const data = useData()
-  data.onUpdate = (models) => {
-    console.log("On Update ModelListe? Length:", models)
-    setModels([...models])
-  }
-
-
-  // useEffect(() => {
-  //   const ls = localStorage.getItem('data')
-  //   if (!ls) return
-  //   const modellist = JSON.parse(ls) as Model[]
-  //   if (!modellist) return
-  //   data.initializeList(
-  //     modellist.map(
-  //       item => Model.parseJSON(item, data))
-  //   )
-  // }, [data])
+  const render = useRerender()
+  const { models } = useApp()
+  models.onUpdate.do(render)
 
   return (
     <>
-      {models.map(model => (
+      {models.list.map(model => (
         <ModelComponent
           key={model.id}
           data={model}

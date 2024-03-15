@@ -1,29 +1,44 @@
 import { MutableRefObject, ReactNode, createContext, useContext, useEffect, useRef, useState } from "react"
 import { Pos } from "./pos"
 import { EventListener } from "./EventListener"
+import { useApp } from "./App"
 
 export class ModelList {
-  models: Model[] = []
+  list: Model[] = []
 
   constructor() {
 
   }
-  public onUpdate: (current: Model[]) => void = () => { }
+  onUpdate = new EventListener<Model[]>
+
+  useLocalStorageInitialization() {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      const ls = localStorage.getItem('data')
+      if (!ls) return
+      const data = JSON.parse(ls) as Model[]
+      if (!data) return
+      this.initializeList(
+        data.map(
+          item => Model.parseJSON(item, this))
+      )
+    }, [])
+  }
 
   createModel(position: Pos) {
     console.log("Hello?")
-    this.models.push(new Model(crypto.randomUUID(), position, this))
-    this.onUpdate(this.models)
+    this.list.push(new Model(crypto.randomUUID(), position, this))
+    this.onUpdate.emit(this.list)
   }
   get(id: string) {
-    return this.models.find(m => m.id === id)
+    return this.list.find(m => m.id === id)
   }
   initializeList(models: Model[]) {
-    this.models = models
-    this.onUpdate(models)
+    this.list = models
+    this.onUpdate.emit(this.list)
   }
   save() {
-    if (this.models.length > 0) { localStorage.setItem('data', JSON.stringify(this.models)) }
+    if (this.list.length > 0) { localStorage.setItem('data', JSON.stringify(this.list)) }
   }
 
 }
@@ -61,28 +76,4 @@ export class Model {
   static parseJSON(json: any, parent: ModelList) {
     return new Model(json.id, Pos.fromObject(json.position), parent)
   }
-}
-
-const ModelDataContext = createContext<MutableRefObject<ModelList>>({} as any)
-export const useDataRef = () => useContext(ModelDataContext)
-export const useData = () => useDataRef().current
-
-export function ModelDataContextProvider(props: { children: ReactNode }) {
-  const modelDataRef = useRef(new ModelList)
-  useEffect(() => {
-    const ls = localStorage.getItem('data')
-    if (!ls) return
-    const data = JSON.parse(ls) as Model[]
-    if (!data) return
-    modelDataRef.current.initializeList(
-      data.map(
-        item => Model.parseJSON(item, modelDataRef.current))
-    )
-  }, [])
-
-  return (
-    <ModelDataContext.Provider value={modelDataRef}>
-      {props.children}
-    </ModelDataContext.Provider>
-  )
 }
