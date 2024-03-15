@@ -4,7 +4,7 @@
 import { WorkspaceView } from "./WorkspaceView"
 import { ZoomDebug } from "./debug"
 import { SelectionBox } from "./Selection"
-import { Drag, DragContext } from "./DragContext"
+import { Drag } from "./DragContext"
 import { ModelDataContextProvider } from "./ModelDataContext"
 import { ModelListComponent } from "./ModelList"
 import { AppContextMenu } from "./ContextMenu"
@@ -13,6 +13,19 @@ import { Tab } from "./use-active-tab"
 import { Mouse } from "./use-mouse3"
 import { Viewport } from "./Viewport"
 import { useEventListener } from "./use-event-listener"
+
+const App = {
+  Mouse,
+  Tab,
+  viewport: new Viewport(),
+  drag: new Drag(),
+  useHooks() {
+    this.viewport.useInit()
+    this.drag.useInit()
+    // Disables macos trackpad scrolling
+    useEventListener('wheel', (e) => { e.preventDefault() }, { passive: false })
+  }
+}
 
 const AppRefContext = createContext<typeof App>({} as any)
 export const useApp = () => useContext(AppRefContext)
@@ -42,15 +55,3 @@ export function AppComponent() {
   )
 }
 
-const App = {
-  Mouse,
-  Tab,
-  viewport: new Viewport(),
-  drag: new Drag(),
-  useHooks() {
-    this.viewport.useInit()
-    this.drag.useInit()
-    // Disables macos trackpad scrolling
-    useEventListener('wheel', (e) => { e.preventDefault() }, { passive: false })
-  }
-}
