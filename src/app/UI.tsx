@@ -6,7 +6,7 @@ import { useRerender } from "./use-rerender"
 
 export default function UILayer() {
   return (
-    <div className="fixed text-white z-10 h-screen w-screen">
+    <div className="fixed text-white z-30">
       <TopBar />
 
       <BottomBar />
