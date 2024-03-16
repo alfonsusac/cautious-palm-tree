@@ -19,7 +19,7 @@ export function WorkspaceView(
         transform: `perspective(1px) ` + translateZ(viewport.zoom.scale) + translateX(viewport.position.x) + translateY(viewport.position.y),
       }}
     >
-      <div className="pointer-events-none w-screen h-screen -translate-x-1/2 -translate-y-1/2 absolute border border-dashed  border-neutral-700 bg-neutral-900/50" />
+      <div className="pointer-events-none w-screen h-screen -translate-x-1/2 -translate-y-1/2 absolute border border-dashed  border-neutral-700" />
       {props.children}
     </div>
   )

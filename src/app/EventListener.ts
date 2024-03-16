@@ -21,6 +21,10 @@ export class EventListener<T> {
       // this.handlers.push(handler)
     }
   }
+  // Clears all handlers
+  clear() {
+    this.handlers = []
+  }
 
   emit(payload: T) {
     this.handlers.forEach(h => h(payload))

@@ -26,8 +26,13 @@ export class ModelList {
   }
 
   createModel(position: Pos) {
-    console.log("Hello?")
     this.list.push(new Model(crypto.randomUUID(), position, this))
+    this.onUpdate.emit(this.list)
+  }
+  deleteModel(id: string) {
+    const model = this.list.find(m => m.id === id)
+    model?.onUpdate2.clear() // clears event listener
+    this.list = this.list.filter(m => m.id !== id)
     this.onUpdate.emit(this.list)
   }
   get(id: string) {
@@ -51,7 +56,7 @@ export class Model {
     public position: Pos,
     readonly parent?: ModelList,
   ) { }
-  onUpdate: (current: Model) => void = () => { }
+  // onUpdate: (current: Model) => void = () => { }
   onUpdate2 = new EventListener<Model>
   updatePosition(newPos: Pos) {
     this.position = newPos
@@ -61,7 +66,7 @@ export class Model {
   }
   set selected(val: boolean) {
     this._selected = val
-    this.onUpdate(this)
+    // this.onUpdate(this)
     this.onUpdate2.emit(this)
   }
   get selected() { return this._selected }

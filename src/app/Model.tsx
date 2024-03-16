@@ -116,6 +116,7 @@ export function ModelComponent(
       // outlineWidth: `${ model.selected ? inverseScale * 2 : 0 }px`,
       transform: `translateX(${ position.x }px) translateY(${ position.y }px)`
     }}
+    data-context={`model__${ props.data.id }`}
   >
     <div className="">
       {position + ""}<br />
