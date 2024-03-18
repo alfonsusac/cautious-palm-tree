@@ -1,19 +1,19 @@
 import { Pos } from "./pos"
-import { CustomMouseEventPayload } from "./use-mouse2"
 import { Zoom } from "./handle-zoom"
+import { MouseEventPayload } from "./use-mouse3"
 
 export function handlePanning(
-  mouse: CustomMouseEventPayload,
+  mouse: MouseEventPayload,
   zoom: Zoom,
   focused: boolean,
 ) {
   // Panning via middle click
-  if (mouse.middleClick) {
+  if (mouse.middleDown) {
     document.body.style.cursor = 'grab'
   } else {
     document.body.style.cursor = 'auto'
   }
-  if (focused && mouse.middleClick) {
+  if (focused && mouse.middleDown) {
     return mouse.positionDelta
   }
 

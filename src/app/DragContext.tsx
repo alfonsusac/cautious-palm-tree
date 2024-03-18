@@ -5,6 +5,7 @@ import { getElementIdUnderMouse } from "./use-mouse2"
 import { useApp } from "./App"
 import { Mouse } from "./use-mouse3"
 import { ObservableValue } from "./EventListener"
+import toast from "react-hot-toast"
 
 export class Drag {
   context = new ObservableValue<{ id: string, initialPosition: Pos } | undefined>
@@ -13,18 +14,18 @@ export class Drag {
     // how to ensure that this runs once per component?
     Mouse.onMouseUpdate.do(mouse => {
       // Initialize selection
-      if (mouse.leftClick && !mouse.positionDelta.isZero && !this.active) {
+      if (mouse.leftDown && !mouse.positionDelta.isZero && !this.active) {
         this.startDragging(getElementIdUnderMouse(mouse) ?? "workspace", mouse.position)
       }
-      if (this.context.value?.initialPosition && mouse.position && mouse.leftClick) {
+      if (this.context.value?.initialPosition && mouse.position && mouse.leftDown) {
         this.region.setValue(Rect.fromPos(this.context.value.initialPosition, mouse.position))
       }
-      if (!mouse.leftClick) {
+      if (!mouse.leftDown) {
         this.endDragging()
         this.region.setValue(undefined)
       }
       // End drag on keyup
-      if (mouse.prev?.leftClick && !mouse.leftClick && this.region.value) {
+      if (mouse.leftRelease && this.region.value) {
         this.endDragging()
         this.region.setValue(undefined)
       }

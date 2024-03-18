@@ -1,33 +1,25 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Pos } from "./pos"
 // import { useMouseDrag } from "./use-mouse-drag"
 import { cn } from "@/lib/utils"
 // import { useZoom } from "./use-zoom"
 // import { useDragContext } from "./DragContext"
-import { useMouse } from "./use-mouse2"
 import { Model } from "./ModelDataContext"
 import { useApp } from "./App"
+import { useRerender } from "./use-rerender"
 
 export function ModelComponent(
   props: {
     data: Model,
     onDragEnd: (newPos: Pos) => void,
-    // selectionListRef: RefObject<string[]>
   }
 ) {
-  const [position, setPosition] = useState(props.data.position)
-
-  props.data.onUpdate2.do((model: Model) => {
-    setPosition(model.position)
-  })
-
-  const { viewport, drag } = useApp()
-
-  useMouse(mouse => {
-    if (mouse.position && drag.context.value?.id === props.data.id) {
-      props.data.updatePosition(position.add(mouse.positionDelta.scale(viewport.zoom.inversedScale)))
-    }
-  })
+  const model = props.data
+  const { viewport } = useApp()
+  const render = useRerender()
+  model.onUpdate.do(render)
+  const ref = useRef<HTMLDivElement>(null)
+  // model.domref = ref.current
 
   // const [isInsideSelection, setIsInsideSelection] = useState(false)
 
@@ -104,7 +96,10 @@ export function ModelComponent(
 
   return <div
     id={props.data.id}
-    // ref={ref}
+    ref={(dom) => {
+      model.domref = dom
+      return ref
+    }}
     className={cn(
       "min-w-40 absolute h-40 text-nowrap select-none  text-sm",
       'outline-blue-500 outline-offset-2 outline outline-0',
@@ -113,13 +108,14 @@ export function ModelComponent(
       '*:leading-none',
     )}
     style={{
-      // outlineWidth: `${ model.selected ? inverseScale * 2 : 0 }px`,
-      transform: `translateX(${ position.x }px) translateY(${ position.y }px)`
+      outlineWidth: `${ model.selected ? viewport.zoom.inversedScale * 2 : 0 }px`,
+      transform: `translateX(${ model.position.x }px) translateY(${ model.position.y }px)`
     }}
-    data-context={`model__${ props.data.id }`}
+    data-context={`model__${ model.id }`}
+    data-model={model.id}
   >
     <div className="">
-      {position + ""}<br />
+      {model.position + ""}<br />
     </div>
     {/* Dragging: {isDragging + ""}<br />
     Selection: {selection.includes(props.data.id) + ""}<br />

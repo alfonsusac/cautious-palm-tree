@@ -34,5 +34,11 @@ export class Pos {
   get isZero() {
     return this.x === 0 && this.y === 0
   }
+  equalTo(that: Pos) {
+    return this.x === that.x && this.y === that.y
+  }
+  notEqualTo(that: Pos) {
+    return !this.equalTo(that)
+  }
 
 }

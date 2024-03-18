@@ -24,7 +24,7 @@ const App = {
   useHooks() {
     this.viewport.useInit()
     this.drag.useInit()
-    this.models.useLocalStorageInitialization()
+    this.models.useInitialization(this.drag, this.viewport)
     // Disables macos trackpad scrolling
     useEventListener('wheel', (e) => { e.preventDefault() }, { passive: false })
   },

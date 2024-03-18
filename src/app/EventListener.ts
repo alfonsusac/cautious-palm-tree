@@ -1,13 +1,13 @@
 import { useEffect } from "react"
 
-type Handler<T> = (padload: T) => void
+type Handler<T> = (padload: T, prev?: T) => void
 
 
 
 export class EventListener<T> {
   handlers: Handler<T>[] = []
+
   addHandler(handler: Handler<T>) {
-    // console.log("Adding handler to event listener. Count:", this.handlers.length)
     if (!this.handlers.includes(handler)) {
       this.handlers.push(handler)
     } else {
@@ -16,18 +16,24 @@ export class EventListener<T> {
   }
   removeHandler(handler: Handler<T>) {
     if (this.handlers.includes(handler)) {
-      // console.log("Removing handler to event listener. Count:", this.handlers.length)
       this.handlers = this.handlers.filter(h => h !== handler)
       // this.handlers.push(handler)
     }
+  }
+  doOnce(handler: Handler<T>) {
+    const handlerWrapper = (pl: T) => {
+      this.removeHandler(handlerWrapper)
+      handler(pl)
+    }
+    this.addHandler(handlerWrapper)
   }
   // Clears all handlers
   clear() {
     this.handlers = []
   }
 
-  emit(payload: T) {
-    this.handlers.forEach(h => h(payload))
+  emit(payload: T, prev?: T) {
+    this.handlers.forEach(h => h(payload, prev))
   }
   do(handler: Handler<T>, deps?: any[]) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -43,6 +49,7 @@ export class EventListener<T> {
 
 export class ObservableValue<T> extends EventListener<T> {
 
+  private _prevValue: T | undefined
   private _value: T
 
   constructor()
@@ -53,7 +60,8 @@ export class ObservableValue<T> extends EventListener<T> {
   }
   set value(newValue: T) {
     this._value = newValue
-    this.emit(this._value)
+    this.emit(this._value, this._prevValue)
+    this._prevValue = this._value
   }
   get value() {
     return this._value
